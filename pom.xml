@@ -31,7 +31,7 @@
         <dependency>
             <groupId>guru.nidi.raml</groupId>
             <artifactId>raml-tester</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
 
         <dependency>
@@ -51,5 +51,13 @@
         </dependency>
 
     </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>nidi</id>
+            <url>https://rawgithub.com/nidi3/maven-repo/master/repo/releases/</url>
+        </repository>
+    </repositories>
 
 </project>
