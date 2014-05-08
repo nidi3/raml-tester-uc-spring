@@ -1,7 +1,10 @@
 package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlViolations;
+import guru.nidi.ramltester.TestRaml;
 import guru.nidi.ramltester.spring.RequestResponseMatchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -36,7 +40,7 @@ public class SimpleTest {
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        api = RamlDefinition.fromClasspath(getClass(), "api.yaml");
+        api = TestRaml.load("api.yaml").fromClasspath(getClass());
         requestResponse = requestResponse().withServletUri("http://nidi.guru/raml/simple/v1");
     }
 
@@ -47,6 +51,13 @@ public class SimpleTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
+    }
+
+    @Test
+    public void greetings() throws Exception {
+        final MvcResult mvcResult = this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json"))).andReturn();
+        final RamlViolations violations = api.testAgainst(mvcResult, "http://nidi.guru/raml/simple/v1");
+        Assert.assertTrue(violations.isEmpty());
     }
 
 }
