@@ -1,7 +1,7 @@
 package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlViolations;
+import guru.nidi.ramltester.RamlReport;
 import guru.nidi.ramltester.TestRaml;
 import guru.nidi.ramltester.spring.RequestResponseMatchers;
 import org.junit.Assert;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = Application.class)
-public class SimpleTest {
+public class TestInMockContext {
 
     @Autowired
     private WebApplicationContext wac;
@@ -45,7 +45,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void greeting() throws Exception {
+    public void testGreetingWithMatcher() throws Exception {
         this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json")))
                 .andExpect(requestResponse.matchesRaml(api))
                 .andExpect(status().isOk())
@@ -54,10 +54,11 @@ public class SimpleTest {
     }
 
     @Test
-    public void greetings() throws Exception {
+    public void testGreetingWithMvcResult() throws Exception {
         final MvcResult mvcResult = this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json"))).andReturn();
-        final RamlViolations violations = api.testAgainst(mvcResult, "http://nidi.guru/raml/simple/v1");
-        Assert.assertTrue(violations.isEmpty());
+        final RamlReport report = api.testAgainst(mvcResult, "http://nidi.guru/raml/simple/v1");
+        Assert.assertTrue(report.isEmpty());
     }
+
 
 }

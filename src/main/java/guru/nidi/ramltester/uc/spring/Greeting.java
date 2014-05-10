@@ -1,8 +1,11 @@
 package guru.nidi.ramltester.uc.spring;
 
 public class Greeting {
-    private final long id;
-    private final String content;
+    private long id;
+    private String content;
+
+    public Greeting() {
+    }
 
     public Greeting(long id, String content) {
         this.id = id;
@@ -15,6 +18,14 @@ public class Greeting {
 
     public String getContent() {
         return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }
 
