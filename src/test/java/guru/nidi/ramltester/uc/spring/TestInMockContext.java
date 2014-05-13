@@ -16,7 +16,6 @@
 package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.TestRaml;
 import guru.nidi.ramltester.core.RamlReport;
 import guru.nidi.ramltester.spring.RamlMatcher;
 import org.junit.Assert;
@@ -54,7 +53,7 @@ public class TestInMockContext {
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        api = TestRaml.load("api.yaml").fromClasspath(getClass());
+        api = RamlDefinition.load("api.yaml").fromClasspath(getClass());
         apiMatches = api.matches().assumingServletUri("http://nidi.guru/raml/simple/v1");
     }
 
