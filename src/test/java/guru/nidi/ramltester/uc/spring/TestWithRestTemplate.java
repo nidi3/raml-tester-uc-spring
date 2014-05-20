@@ -15,7 +15,7 @@
  */
 package guru.nidi.ramltester.uc.spring;
 
-import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlTester;
 import guru.nidi.ramltester.spring.RamlRestTemplate;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,8 +32,10 @@ public class TestWithRestTemplate {
     @Before
     public void setup() {
         Application.main();
-        restTemplate = RamlDefinition.load("api.yaml").fromClasspath(getClass())
-                .createRestTemplate(new HttpComponentsClientHttpRequestFactory()).assumingBaseUri("http://nidi.guru/raml/simple/v1");
+        restTemplate = RamlTester
+                .fromClasspath(getClass()).load("api.yaml")
+                .assumingServletUri("http://nidi.guru/raml/simple/v1")
+                .createRestTemplate(new HttpComponentsClientHttpRequestFactory());
     }
 
     @Test

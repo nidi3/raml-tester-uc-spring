@@ -16,8 +16,8 @@
 package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlDefinition;
+import guru.nidi.ramltester.RamlTester;
 import guru.nidi.ramltester.core.RamlReport;
-import guru.nidi.ramltester.spring.RamlMatcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,19 +48,17 @@ public class TestInMockContext {
 
     private MockMvc mockMvc;
     private RamlDefinition api;
-    private RamlMatcher apiMatches;
 
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        api = RamlDefinition.load("api.yaml").fromClasspath(getClass());
-        apiMatches = api.matches().assumingServletUri("http://nidi.guru/raml/simple/v1");
+        api = RamlTester.fromClasspath(getClass()).load("api.yaml").assumingServletUri("http://nidi.guru/raml/simple/v1");
     }
 
     @Test
     public void testGreetingWithMatcher() throws Exception {
         this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json")))
-                .andExpect(apiMatches)
+                .andExpect(api.matches())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
@@ -69,7 +67,7 @@ public class TestInMockContext {
     @Test
     public void testGreetingWithMvcResult() throws Exception {
         final MvcResult mvcResult = this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json"))).andReturn();
-        final RamlReport report = api.testAgainst(mvcResult, "http://nidi.guru/raml/simple/v1");
+        final RamlReport report = api.testAgainst(mvcResult);
         Assert.assertTrue(report.isEmpty());
     }
 
