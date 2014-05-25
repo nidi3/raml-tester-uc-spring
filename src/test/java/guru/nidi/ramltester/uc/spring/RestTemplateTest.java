@@ -25,7 +25,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 /**
  *
  */
-public class TestWithRestTemplate {
+public class RestTemplateTest {
 
     private RamlRestTemplate restTemplate;
 
@@ -40,7 +40,7 @@ public class TestWithRestTemplate {
 
     @Test
     public void testGreetingWithRestTemplate() {
-        final Greeting greeting = restTemplate.getForObject("http://localhost:8080/greeting", Greeting.class);
+        final Greeting greeting = restTemplate.getForObject("http://localhost:8081/greeting", Greeting.class);
         Assert.assertTrue(restTemplate.getLastReport().isEmpty());
     }
 
