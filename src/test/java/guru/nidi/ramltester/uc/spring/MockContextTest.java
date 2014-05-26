@@ -16,7 +16,7 @@
 package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlDefinition;
-import guru.nidi.ramltester.RamlTester;
+import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.core.RamlReport;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,7 +52,10 @@ public class MockContextTest {
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        api = RamlTester.fromClasspath(getClass()).load("api.yaml").assumingServletUri("http://nidi.guru/raml/simple/v1");
+        api = RamlLoaders
+                .fromClasspath(getClass())
+                .load("api.yaml")
+                .assumingBaseUri("http://nidi.guru/raml/simple/v1");
     }
 
     @Test
