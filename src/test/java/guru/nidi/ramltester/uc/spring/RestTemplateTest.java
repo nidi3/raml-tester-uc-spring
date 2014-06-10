@@ -44,5 +44,12 @@ public class RestTemplateTest {
         Assert.assertTrue(restTemplate.getLastReport().isEmpty());
     }
 
+    @Test
+    public void testOnlyRequestGreetingWithRestTemplate() {
+        final Greeting greeting = restTemplate.notSending()
+                .getForObject("http://localhost:8081/greeting", Greeting.class);
+        Assert.assertTrue(restTemplate.getLastReport().isEmpty());
+    }
+
 
 }
