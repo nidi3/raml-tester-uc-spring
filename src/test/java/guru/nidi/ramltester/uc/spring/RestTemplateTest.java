@@ -16,26 +16,38 @@
 package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.SimpleReportAggregator;
+import guru.nidi.ramltester.junit.ExpectedUsage;
 import guru.nidi.ramltester.spring.RamlRestTemplate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 /**
  *
  */
 public class RestTemplateTest {
+    private static SimpleReportAggregator aggregator = new SimpleReportAggregator();
 
-    private RamlRestTemplate restTemplate;
+    private static RamlRestTemplate restTemplate = RamlLoaders
+            .fromClasspath(RestTemplateTest.class).load("api.yaml")
+            .assumingBaseUri("http://nidi.guru/raml/simple/v1")
+            .createRestTemplate(new HttpComponentsClientHttpRequestFactory())
+            .aggregating(aggregator);
 
-    @Before
-    public void setup() {
-        Application.main();
-        restTemplate = RamlLoaders
-                .fromClasspath(getClass()).load("api.yaml")
-                .assumingBaseUri("http://nidi.guru/raml/simple/v1")
-                .createRestTemplate(new HttpComponentsClientHttpRequestFactory());
+    private static ApplicationContext context;
+
+    @ClassRule
+    public static ExpectedUsage expectedUsage = new ExpectedUsage(aggregator);
+
+    @BeforeClass
+    public static void setup() {
+        context = Application.start();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        Application.stop(context);
     }
 
     @Test
@@ -47,7 +59,7 @@ public class RestTemplateTest {
     @Test
     public void testOnlyRequestGreetingWithRestTemplate() {
         final Greeting greeting = restTemplate.notSending()
-                .getForObject("http://localhost:8081/greeting", Greeting.class);
+                .getForObject("http://localhost:8081/greeting?name=bla", Greeting.class);
         Assert.assertTrue(restTemplate.getLastReport().isEmpty());
     }
 

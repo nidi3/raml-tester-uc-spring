@@ -17,9 +17,12 @@ package guru.nidi.ramltester.uc.spring;
 
 import guru.nidi.ramltester.RamlDefinition;
 import guru.nidi.ramltester.RamlLoaders;
+import guru.nidi.ramltester.SimpleReportAggregator;
 import guru.nidi.ramltester.core.RamlReport;
+import guru.nidi.ramltester.junit.ExpectedUsage;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,26 +45,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @ContextConfiguration(classes = Application.class)
 public class MockContextTest {
+    private static SimpleReportAggregator aggregator = new SimpleReportAggregator();
+    private static RamlDefinition api = RamlLoaders
+            .fromClasspath(MockContextTest.class)
+            .load("api.yaml")
+            .assumingBaseUri("http://nidi.guru/raml/simple/v1");
 
     @Autowired
     private WebApplicationContext wac;
 
     private MockMvc mockMvc;
-    private RamlDefinition api;
+
+    @ClassRule
+    public static ExpectedUsage expectedUsage = new ExpectedUsage(aggregator);
 
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        api = RamlLoaders
-                .fromClasspath(getClass())
-                .load("api.yaml")
-                .assumingBaseUri("http://nidi.guru/raml/simple/v1");
     }
 
     @Test
     public void testGreetingWithMatcher() throws Exception {
-        this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json")))
-                .andExpect(api.matches())
+        mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json")))
+                .andExpect(api.matches().aggregating(aggregator))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
@@ -69,8 +75,10 @@ public class MockContextTest {
 
     @Test
     public void testGreetingWithMvcResult() throws Exception {
-        final MvcResult mvcResult = this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("application/json"))).andReturn();
-        final RamlReport report = api.testAgainst(mvcResult);
+        final MvcResult mvcResult = mockMvc
+                .perform(get("/greeting?name=hula").accept(MediaType.parseMediaType("application/json")))
+                .andReturn();
+        final RamlReport report = aggregator.addReport(api.testAgainst(mvcResult));
         Assert.assertTrue(report.isEmpty());
     }
 

@@ -17,6 +17,7 @@ package guru.nidi.ramltester.uc.spring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -26,7 +27,11 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableAutoConfiguration
 public class Application {
 
-    public static void main(String... args) {
-        SpringApplication.run(Application.class, "--server.port=8081");
+    public static ApplicationContext start() {
+        return SpringApplication.run(Application.class, "--server.port=8081");
+    }
+
+    public static void stop(ApplicationContext context) {
+        SpringApplication.exit(context);
     }
 }
