@@ -23,6 +23,9 @@ import org.junit.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
+import static guru.nidi.ramltester.junit.RamlMatchers.hasNoViolations;
+import static org.junit.Assert.assertThat;
+
 /**
  *
  */
@@ -30,7 +33,7 @@ public class RestTemplateTest {
     private static SimpleReportAggregator aggregator = new SimpleReportAggregator();
 
     private static RamlRestTemplate restTemplate = RamlLoaders
-            .fromClasspath(RestTemplateTest.class).load("api.yaml")
+            .fromClasspath(RestTemplateTest.class).load("api.raml")
             .assumingBaseUri("http://nidi.guru/raml/simple/v1")
             .createRestTemplate(new HttpComponentsClientHttpRequestFactory())
             .aggregating(aggregator);
@@ -57,10 +60,16 @@ public class RestTemplateTest {
     }
 
     @Test
+    public void testNullResponseName() {
+        final Greeting greeting = restTemplate.getForObject("http://localhost:8081/greeting?name=", Greeting.class);
+        assertThat(restTemplate.getLastReport(), hasNoViolations());
+    }
+
+    @Test
     public void testOnlyRequestGreetingWithRestTemplate() {
         final Greeting greeting = restTemplate.notSending()
                 .getForObject("http://localhost:8081/greeting?name=bla", Greeting.class);
-        Assert.assertTrue(restTemplate.getLastReport().isEmpty());
+        assertThat(restTemplate.getLastReport(), hasNoViolations());
     }
 
 

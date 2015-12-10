@@ -30,6 +30,6 @@ public class GreetingController {
     @RequestMapping("/greeting")
     @ResponseBody
     public Greeting greeting(@RequestParam(value = "name", required = false, defaultValue = "World") String name) {
-        return new Greeting(counter.incrementAndGet(), String.format(template, name));
+        return new Greeting(counter.incrementAndGet(), name.length() == 0 ? null : String.format(template, name));
     }
 }

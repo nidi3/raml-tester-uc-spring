@@ -20,7 +20,6 @@ import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.SimpleReportAggregator;
 import guru.nidi.ramltester.core.RamlReport;
 import guru.nidi.ramltester.junit.ExpectedUsage;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -35,6 +34,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static guru.nidi.ramltester.junit.RamlMatchers.hasNoViolations;
+import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -48,7 +49,7 @@ public class MockContextTest {
     private static SimpleReportAggregator aggregator = new SimpleReportAggregator();
     private static RamlDefinition api = RamlLoaders
             .fromClasspath(MockContextTest.class)
-            .load("api.yaml")
+            .load("api.raml")
             .assumingBaseUri("http://nidi.guru/raml/simple/v1");
 
     @Autowired
@@ -79,7 +80,7 @@ public class MockContextTest {
                 .perform(get("/greeting?name=hula").accept(MediaType.parseMediaType("application/json")))
                 .andReturn();
         final RamlReport report = aggregator.addReport(api.testAgainst(mvcResult));
-        Assert.assertTrue(report.isEmpty());
+        assertThat(report, hasNoViolations());
     }
 
 
