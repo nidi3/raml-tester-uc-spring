@@ -19,7 +19,10 @@ import guru.nidi.ramltester.RamlLoaders;
 import guru.nidi.ramltester.SimpleReportAggregator;
 import guru.nidi.ramltester.junit.ExpectedUsage;
 import guru.nidi.ramltester.spring.RamlRestTemplate;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
@@ -56,19 +59,18 @@ public class RestTemplateTest {
     @Test
     public void testGreetingWithRestTemplate() {
         final Greeting greeting = restTemplate.getForObject("http://localhost:8081/greeting", Greeting.class);
-        Assert.assertTrue(restTemplate.getLastReport().isEmpty());
+        assertThat(restTemplate.getLastReport(), hasNoViolations());
     }
 
     @Test
     public void testNullResponseName() {
-        final Greeting greeting = restTemplate.getForObject("http://localhost:8081/greeting?name=", Greeting.class);
+        final Greeting greeting = restTemplate.getForObject("http://localhost:8081/greeting?name=null", Greeting.class);
         assertThat(restTemplate.getLastReport(), hasNoViolations());
     }
 
     @Test
     public void testOnlyRequestGreetingWithRestTemplate() {
-        final Greeting greeting = restTemplate.notSending()
-                .getForObject("http://localhost:8081/greeting?name=bla", Greeting.class);
+        final Greeting greeting = restTemplate.notSending().getForObject("http://localhost:8081/greeting?name=bla", Greeting.class);
         assertThat(restTemplate.getLastReport(), hasNoViolations());
     }
 
